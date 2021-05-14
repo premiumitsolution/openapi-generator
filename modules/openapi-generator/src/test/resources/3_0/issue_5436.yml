@@ -49,3 +49,9 @@ components:
         age:
           type: integer
           example: 15
+        mytest:
+          type: string
+          enum:
+            - helloMyBrotherHowAreYUU
+            - NirmYa
+            - DA_SHO_TI_GOVORISH

@@ -36,6 +36,12 @@ components:
       properties:
         status:
           type: string
+        code:
+          type: string
+          enum:
+            - testCamel
+            - TEST_SNAKE
+            - whereMyCode
     DummyRequest:
       required:
         - product_id

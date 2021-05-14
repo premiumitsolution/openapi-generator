@@ -49,6 +49,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static org.openapitools.codegen.CodegenConstants.ENUM_PROPERTY_NAMING;
 import static org.openapitools.codegen.utils.StringUtils.*;
 
 public abstract class AbstractJavaCodegen extends DefaultCodegen implements CodegenConfig {
@@ -113,6 +114,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     protected List<String> additionalModelTypeAnnotations = new LinkedList<>();
     protected List<String> additionalEnumTypeAnnotations = new LinkedList<>();
     protected boolean openApiNullable = true;
+    protected CodegenConstants.ENUM_PROPERTY_NAMING_TYPE enumPropertyNaming = CodegenConstants.ENUM_PROPERTY_NAMING_TYPE.snake_case;
 
     public AbstractJavaCodegen() {
         super();
@@ -272,6 +274,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         if (StringUtils.isEmpty(System.getenv("JAVA_POST_PROCESS_FILE"))) {
             LOGGER.info("Environment variable JAVA_POST_PROCESS_FILE not defined so the Java code may not be properly formatted. To define it, try 'export JAVA_POST_PROCESS_FILE=\"/usr/local/bin/clang-format -i\"' (Linux/Mac)");
             LOGGER.info("NOTE: To enable file post-processing, 'enablePostProcessFile' must be set to `true` (--enable-post-process-file for CLI).");
+        }
+
+        if (additionalProperties.containsKey(ENUM_PROPERTY_NAMING)) {
+            this.setEnumPropertyNaming((String) additionalProperties.get(ENUM_PROPERTY_NAMING));
         }
 
         if (additionalProperties.containsKey(SUPPORT_JAVA6)) {
@@ -924,7 +930,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
                     LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     return String.format(Locale.ROOT, localDate.toString(), "");
                 } else if (schema.getDefault() instanceof java.time.OffsetDateTime) {
-                    return "OffsetDateTime.parse(\"" +  String.format(Locale.ROOT, ((java.time.OffsetDateTime) schema.getDefault()).atZoneSameInstant(ZoneId.systemDefault()).toString(), "") + "\", java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME.withZone(java.time.ZoneId.systemDefault()))";
+                    return "OffsetDateTime.parse(\"" + String.format(Locale.ROOT, ((java.time.OffsetDateTime) schema.getDefault()).atZoneSameInstant(ZoneId.systemDefault()).toString(), "") + "\", java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME.withZone(java.time.ZoneId.systemDefault()))";
                 } else {
                     _default = (String) schema.getDefault();
                 }
@@ -1381,18 +1387,48 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         return sanitizeName(camelize(property.name)) + "Enum";
     }
 
+//    @Override
+//    public String toEnumVarName(String value, String datatype) {
+//        if (value.length() == 0) {
+//            return "EMPTY";
+//        }
+//
+//        // for symbol, e.g. $, #
+//        if (getSymbolName(value) != null) {
+//            return getSymbolName(value).toUpperCase(Locale.ROOT);
+//        }
+//
+//        // number
+//        if ("Integer".equals(datatype) || "Long".equals(datatype) ||
+//                "Float".equals(datatype) || "Double".equals(datatype) || "BigDecimal".equals(datatype)) {
+//            String varName = "NUMBER_" + value;
+//            varName = varName.replaceAll("-", "MINUS_");
+//            varName = varName.replaceAll("\\+", "PLUS_");
+//            varName = varName.replaceAll("\\.", "_DOT_");
+//            return varName;
+//        }
+//
+//        // string
+////        String var = value.replaceAll("\\W+", "_");
+//        String var = value.replaceAll("(.+?)([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
+//
+//        if (var.matches("\\d.*")) {
+//            return "_" + var;
+//        } else {
+//            return var;
+//        }
+//    }
+
     @Override
     public String toEnumVarName(String value, String datatype) {
+        String modified;
         if (value.length() == 0) {
-            return "EMPTY";
+            modified = "EMPTY";
+        } else {
+            modified = value;
+//            modified = sanitizeKotlinSpecificNames(modified);
         }
 
-        // for symbol, e.g. $, #
-        if (getSymbolName(value) != null) {
-            return getSymbolName(value).toUpperCase(Locale.ROOT);
-        }
-
-        // number
         if ("Integer".equals(datatype) || "Long".equals(datatype) ||
                 "Float".equals(datatype) || "Double".equals(datatype) || "BigDecimal".equals(datatype)) {
             String varName = "NUMBER_" + value;
@@ -1402,13 +1438,101 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
             return varName;
         }
 
-        // string
-        String var = value.replaceAll("\\W+", "_").toUpperCase(Locale.ROOT);
-        if (var.matches("\\d.*")) {
-            return "_" + var;
-        } else {
-            return var;
+        switch (getEnumPropertyNaming()) {
+            case original:
+                // NOTE: This is provided as a last-case allowance, but will still result in reserved words being escaped.
+                modified = value;
+                break;
+            case camelCase:
+                // NOTE: Removes hyphens and underscores
+                modified = camelize(modified, true);
+                break;
+            case PascalCase:
+                // NOTE: Removes hyphens and underscores
+                String result = camelize(modified);
+                modified = titleCase(result);
+                break;
+            case snake_case:
+                // NOTE: Removes hyphens
+                modified = underscore(modified).toUpperCase();
+                break;
+            case UPPERCASE:
+                modified = underscore(modified).toUpperCase(Locale.ROOT);
+                break;
         }
+
+        if (reservedWords.contains(modified)) {
+            return escapeReservedWord(modified);
+        }
+
+        return sanitizeSpecificNames(modified);
+    }
+
+    public CodegenConstants.ENUM_PROPERTY_NAMING_TYPE getEnumPropertyNaming() {
+        return this.enumPropertyNaming;
+    }
+
+    public void setEnumPropertyNaming(final String enumPropertyNamingType) {
+        try {
+            this.enumPropertyNaming = CodegenConstants.ENUM_PROPERTY_NAMING_TYPE.valueOf(enumPropertyNamingType);
+        } catch (IllegalArgumentException ex) {
+            StringBuilder sb = new StringBuilder(enumPropertyNamingType + " is an invalid enum property naming option. Please choose from:");
+            for (CodegenConstants.ENUM_PROPERTY_NAMING_TYPE t : CodegenConstants.ENUM_PROPERTY_NAMING_TYPE.values()) {
+                sb.append("\n  ").append(t.name());
+            }
+            throw new RuntimeException(sb.toString());
+        }
+    }
+
+    private String sanitizeSpecificNames(final String name) {
+        String word = name;
+        for (Map.Entry<String, String> specialCharacters : specialCharReplacements.entrySet()) {
+            word = replaceSpecialCharacters(word, specialCharacters);
+        }
+        word = word.replaceAll("\\W+", "_");
+        if (word.matches("\\d.*")) {
+            word = "_" + word;
+        }
+        if (word.matches("^_*$")) {
+            word = word.replaceAll("\\Q_\\E", "Underscore");
+        }
+        return word;
+    }
+
+    private String replaceSpecialCharacters(String word, Map.Entry<String, String> specialCharacters) {
+        String specialChar = specialCharacters.getKey();
+        String replacementChar = specialCharacters.getValue();
+        // Underscore is the only special character we'll allow
+        if (!specialChar.equals("_") && word.contains(specialChar)) {
+            return replaceCharacters(word, specialChar, replacementChar);
+        }
+        return word;
+    }
+
+    private String replaceCharacters(String word, String oldValue, String newValue) {
+        if (!word.contains(oldValue)) {
+            return word;
+        }
+        if (word.equals(oldValue)) {
+            return newValue;
+        }
+        int i = word.indexOf(oldValue);
+        String start = word.substring(0, i);
+        String end = recurseOnEndOfWord(word, oldValue, newValue, i);
+        return start + newValue + end;
+    }
+
+    private String recurseOnEndOfWord(String word, String oldValue, String newValue, int lastReplacedValue) {
+        String end = word.substring(lastReplacedValue + 1);
+        if (!end.isEmpty()) {
+            end = titleCase(end);
+            end = replaceCharacters(end, oldValue, newValue);
+        }
+        return end;
+    }
+
+    private String titleCase(final String input) {
+        return input.substring(0, 1).toUpperCase(Locale.ROOT) + input.substring(1);
     }
 
     @Override
@@ -1449,11 +1573,11 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
             return;
         }
 
-        Boolean fixLong = (p.isLong && "l".equals(p.defaultValue.substring(p.defaultValue.length()-1)));
-        Boolean fixDouble = (p.isDouble && "d".equals(p.defaultValue.substring(p.defaultValue.length()-1)));
-        Boolean fixFloat = (p.isFloat && "f".equals(p.defaultValue.substring(p.defaultValue.length()-1)));
+        Boolean fixLong = (p.isLong && "l".equals(p.defaultValue.substring(p.defaultValue.length() - 1)));
+        Boolean fixDouble = (p.isDouble && "d".equals(p.defaultValue.substring(p.defaultValue.length() - 1)));
+        Boolean fixFloat = (p.isFloat && "f".equals(p.defaultValue.substring(p.defaultValue.length() - 1)));
         if (fixLong || fixDouble || fixFloat) {
-            p.defaultValue = p.defaultValue.substring(0, p.defaultValue.length()-1);
+            p.defaultValue = p.defaultValue.substring(0, p.defaultValue.length() - 1);
         }
     }
 

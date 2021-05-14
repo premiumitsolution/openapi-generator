@@ -33,10 +33,12 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.openapitools.codegen.TestUtils.assertFileContains;
@@ -80,7 +82,18 @@ public class SpringCodegenTest {
         generator.setGeneratorPropertyDefault(CodegenConstants.APIS, "true");
         generator.setGeneratorPropertyDefault(CodegenConstants.SUPPORTING_FILES, "false");
 
-        generator.opts(input).generate();
+        List<File> generate = generator.opts(input).generate();
+        generate.forEach((file) -> {
+            String absolutePath = file.getAbsolutePath();
+            Path path = Paths.get(absolutePath);
+
+            try (Stream<String> lines = Files.lines(path)) {
+                lines
+                        .forEach(System.out::println);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         assertFileContains(Paths.get(outputPath + "/src/main/java/org/openapitools/api/ZebrasApi.java"),
                 "AnimalParams");
