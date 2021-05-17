@@ -152,8 +152,7 @@ publishing {
                 password "$pitsNexusPassword"
             }
             allowInsecureProtocol = true
-            def releasesRepoUrl = "https://repo.premiumitsolution.com/repository/pits-release/"
-            url = "https://repo.premiumitsolution.com/repository/pits-snapshot/"
+            url = "https://repo.premiumitsolution.com/repository/pits-release/"
         }
     }
 }
