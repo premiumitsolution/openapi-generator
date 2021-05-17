@@ -114,6 +114,7 @@ publishing {
                 name = 'OpenAPI-Generator Contributors'
                 description = project.description
                 url = 'https://openapi-generator.tech'
+                version = "$pitsPluginVersion"
                 organization {
                     name = 'org.openapitools'
                     url = 'https://github.com/OpenAPITools'
