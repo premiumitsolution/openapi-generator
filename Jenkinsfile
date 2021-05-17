@@ -23,7 +23,7 @@ pipeline {
     }
     stage('Build jar') {
       steps {
-            sh 'mvn clean package -Dmaven.skip.test=true'
+            sh 'mvn clean package -DskipTests=true'
       }
     }
   }
