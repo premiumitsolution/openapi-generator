@@ -49,6 +49,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static org.openapitools.codegen.CodegenConstants.API_DOCS;
 import static org.openapitools.codegen.CodegenConstants.ENUM_PROPERTY_NAMING;
 import static org.openapitools.codegen.utils.StringUtils.*;
 
@@ -1454,7 +1455,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
                 break;
             case snake_case:
                 // NOTE: Removes hyphens
-                modified = underscore(modified).toUpperCase();
+                modified = underscore(modified).toUpperCase(Locale.ROOT);
                 break;
             case UPPERCASE:
                 modified = underscore(modified).toUpperCase(Locale.ROOT);
@@ -1502,7 +1503,6 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     private String replaceSpecialCharacters(String word, Map.Entry<String, String> specialCharacters) {
         String specialChar = specialCharacters.getKey();
         String replacementChar = specialCharacters.getValue();
-        // Underscore is the only special character we'll allow
         if (!specialChar.equals("_") && word.contains(specialChar)) {
             return replaceCharacters(word, specialChar, replacementChar);
         }
