@@ -19,12 +19,12 @@ pipeline {
     }
     stage('Build jar') {
       steps {
-            sh 'mvn clean package -DskipTests=true'
+            sh 'mvn clean deploy -DskipTests=true'
       }
     }
     stage('Deploy to nexus') {
       steps {
-            sh 'cd modules/openapi-generator-gradle-plugin/ && ./gradlew publish -PpitsNexusUser=$PITS_NEXUS_USR -PpitsNexusPassword=$PITS_NEXUS_PSW'
+            sh 'cd modules/openapi-generator-gradle-plugin/ && ./gradlew clean publish -PpitsNexusUser=$PITS_NEXUS_USR -PpitsNexusPassword=$PITS_NEXUS_PSW'
       }
     }
   }
