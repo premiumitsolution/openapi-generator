@@ -27,11 +27,13 @@ pipeline {
                 configs: [
                   fileContentReplaceItemConfig(
                     search: 'var_pitsNexusUser',
-                    replace: env.PITS_NEXUS_USR
+                    replace: env.PITS_NEXUS_USR,
+                    matchCount: 1
                   ),
                   fileContentReplaceItemConfig(
                     search: 'var_pitsNexusPassword',
-                    replace: env.$PITS_NEXUS_PSW
+                    replace: env.$PITS_NEXUS_PSW,
+                    matchCount: 1
                   )
                 ]
               )
