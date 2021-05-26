@@ -50,7 +50,7 @@ pipeline {
     }
     stage('Deploy to nexus') {
       steps {
-            sh 'cd modules/openapi-generator-gradle-plugin/ && ./gradlew clean publish -PpitsNexusUser=$PITS_NEXUS_USR -PpitsNexusPassword=$PITS_NEXUS_PSW'
+            sh 'cd modules/openapi-generator-gradle-plugin/ && ./gradlew clean publishPluginMavenPublicationToMavenRepository -PpitsNexusUser=$PITS_NEXUS_USR -PpitsNexusPassword=$PITS_NEXUS_PSW'
       }
     }
   }
