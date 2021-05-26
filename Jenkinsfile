@@ -26,12 +26,12 @@ pipeline {
                 fileEncoding: 'UTF-8',
                 configs: [
                   fileContentReplaceItemConfig(
-                    search: 'var_pitsNexusUser',
+                    search: 'var_nexusUser',
                     replace: env.PITS_NEXUS_USR,
                     matchCount: 1
                   ),
                   fileContentReplaceItemConfig(
-                    search: 'var_pitsNexusPassword',
+                    search: 'var_nexusPassword',
                     replace: env.$PITS_NEXUS_PSW,
                     matchCount: 1
                   )
