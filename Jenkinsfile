@@ -31,23 +31,11 @@ pipeline {
                   matchCount: 1
                 )
               ]
-            ),
-            fileContentReplaceConfig(
-              filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
-              fileEncoding: 'UTF-8',
-              configs: [
-                fileContentReplaceItemConfig(
-                  search: 'var_nexusPassword',
-                  replace: env.$PITS_NEXUS_PSW,
-                  matchCount: 1
-                )
-              ]
             )
           ]
         )
       }
     }
-
     stage('Build jar') {
       steps {
         configFileProvider([configFile(fileId: 'ea3e963a-6e42-4107-b3ac-c870e1a9108f', variable: 'MAVEN_SETTINGS')]){
