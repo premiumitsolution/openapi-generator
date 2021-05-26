@@ -21,14 +21,14 @@ pipeline {
         steps {
           contentReplace(
             configs: [
-              fileContentReplaceItemConfig(
+              variablesReplaceConfig(
                 filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
                 configs: [
-                  fileContentReplaceItemConfig(
+                  variablesReplaceItemConfig(
                     search: 'var_pitsNexusUser',
                     replace: env.PITS_NEXUS_USR
                   ),
-                  fileContentReplaceItemConfig(
+                  variablesReplaceItemConfig(
                     search: 'var_pitsNexusPassword',
                     replace: env.$PITS_NEXUS_PSW
                   )
