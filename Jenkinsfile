@@ -29,7 +29,17 @@ pipeline {
                     search: 'var_nexusUser',
                     replace: env.PITS_NEXUS_USR,
                     matchCount: 1
-                  ),
+                  )
+                ]
+              )
+            ]
+          ),
+          contentReplace(
+            configs: [
+              fileContentReplaceConfig(
+                filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
+                fileEncoding: 'UTF-8',
+                configs: [
                   fileContentReplaceItemConfig(
                     search: 'var_nexusPassword',
                     replace: env.$PITS_NEXUS_PSW,
