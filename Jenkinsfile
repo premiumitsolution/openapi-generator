@@ -23,6 +23,7 @@ pipeline {
             configs: [
               fileContentReplaceConfig(
                 filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
+                fileEncoding: 'UTF-8',
                 configs: [
                   fileContentReplaceItemConfig(
                     search: 'var_pitsNexusUser',
