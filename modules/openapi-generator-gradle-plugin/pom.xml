@@ -73,43 +73,43 @@
                 </configuration>
             </plugin>
             <!-- 2) run gradle -->
-            <plugin>
-                <groupId>org.fortasoft</groupId>
-                <artifactId>gradle-maven-plugin</artifactId>
-                <version>1.0.8</version>
-                <configuration>
-                    <gradleVersion>${gradleVersion}</gradleVersion>
-                    <args>
-                        <arg>-P openApiGeneratorVersion=${project.version}</arg>
-                    </args>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <!-- goal must be "invoke" -->
-                            <goal>invoke</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <!-- calls "clean assemble install" -->
-                                <task>clean</task>
-                                <task>check</task>
-                                <task>assemble</task>
-                                <task>publishToMavenLocal</task>
-                                <task>publishPluginMavenPublicationToMavenLocal</task>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.gradle</groupId>
-                        <artifactId>gradle-tooling-api</artifactId>
-                        <version>${gradleVersion}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.fortasoft</groupId>-->
+<!--                <artifactId>gradle-maven-plugin</artifactId>-->
+<!--                <version>1.0.8</version>-->
+<!--                <configuration>-->
+<!--                    <gradleVersion>${gradleVersion}</gradleVersion>-->
+<!--                    <args>-->
+<!--                        <arg>-P openApiGeneratorVersion=${project.version}</arg>-->
+<!--                    </args>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>install</phase>-->
+<!--                        <goals>-->
+<!--                            &lt;!&ndash; goal must be "invoke" &ndash;&gt;-->
+<!--                            <goal>invoke</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <tasks>-->
+<!--                                &lt;!&ndash; calls "clean assemble install" &ndash;&gt;-->
+<!--                                <task>clean</task>-->
+<!--                                <task>check</task>-->
+<!--                                <task>assemble</task>-->
+<!--                                <task>publishToMavenLocal</task>-->
+<!--                                <task>publishPluginMavenPublicationToMavenLocal</task>-->
+<!--                            </tasks>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.gradle</groupId>-->
+<!--                        <artifactId>gradle-tooling-api</artifactId>-->
+<!--                        <version>${gradleVersion}</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
