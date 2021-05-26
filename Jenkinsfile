@@ -21,7 +21,7 @@ pipeline {
         steps {
           contentReplace(
             configs: [
-              fileContentReplaceItemConfig(
+              fileContentReplaceConfig(
                 filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
                 configs: [
                   fileContentReplaceItemConfig(
