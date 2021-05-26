@@ -17,6 +17,28 @@ pipeline {
         sh 'printenv'
       }
     }
+    stage('Configs') {
+        steps {
+          contentReplace(
+            configs: [
+              fileContentReplaceItemConfig(
+                filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
+                configs: [
+                  fileContentReplaceItemConfig(
+                    search: 'var_pitsNexusUser',
+                    replace: evn.PITS_NEXUS_USR
+                  ),
+                  fileContentReplaceItemConfig(
+                    search: 'var_pitsNexusPassword',
+                    replace: evn.$PITS_NEXUS_PSW
+                  )
+                ]
+              )
+            ]
+          )
+        }
+      }
+
     stage('Build jar') {
       steps {
         configFileProvider([configFile(fileId: 'ea3e963a-6e42-4107-b3ac-c870e1a9108f', variable: 'MAVEN_SETTINGS')]){
