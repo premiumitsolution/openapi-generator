@@ -34,6 +34,21 @@ pipeline {
             )
           ]
         )
+        contentReplace(
+          configs: [
+            fileContentReplaceConfig(
+              filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
+              fileEncoding: 'UTF-8',
+              configs: [
+                fileContentReplaceItemConfig(
+                  search: 'var_nexusPassword',
+                  replace: env.$PITS_NEXUS_PSW,
+                  matchCount: 1
+                )
+              ]
+            )
+          ]
+        )
       }
     }
     stage('Build jar') {
