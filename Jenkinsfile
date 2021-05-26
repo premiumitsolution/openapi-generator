@@ -19,7 +19,9 @@ pipeline {
     }
     stage('Build jar') {
       steps {
-            sh 'mvn clean deploy -DskipTests=true'
+        configFileProvider([configFile(fileId: 'ea3e963a-6e42-4107-b3ac-c870e1a9108f', variable: 'MAVEN_SETTINGS')]){
+          sh 'mvn s $MAVEN_SETTINGS clean deploy -DskipTests=true'
+        }
       }
     }
     stage('Deploy to nexus') {
