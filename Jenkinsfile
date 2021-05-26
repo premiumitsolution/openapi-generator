@@ -18,39 +18,35 @@ pipeline {
       }
     }
     stage('Configs') {
-        steps {
-          contentReplace(
-            configs: [
-              fileContentReplaceConfig(
-                filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
-                fileEncoding: 'UTF-8',
-                configs: [
-                  fileContentReplaceItemConfig(
-                    search: 'var_nexusUser',
-                    replace: env.PITS_NEXUS_USR,
-                    matchCount: 1
-                  )
-                ]
-              )
-            ]
-          ),
-          contentReplace(
-            configs: [
-              fileContentReplaceConfig(
-                filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
-                fileEncoding: 'UTF-8',
-                configs: [
-                  fileContentReplaceItemConfig(
-                    search: 'var_nexusPassword',
-                    replace: env.$PITS_NEXUS_PSW,
-                    matchCount: 1
-                  )
-                ]
-              )
-            ]
-          )
-        }
+      steps {
+        contentReplace(
+          configs: [
+            fileContentReplaceConfig(
+              filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
+              fileEncoding: 'UTF-8',
+              configs: [
+                fileContentReplaceItemConfig(
+                  search: 'var_nexusUser',
+                  replace: env.PITS_NEXUS_USR,
+                  matchCount: 1
+                )
+              ]
+            ),
+            fileContentReplaceConfig(
+              filePath: 'modules/openapi-generator-gradle-plugin/gradle.properties',
+              fileEncoding: 'UTF-8',
+              configs: [
+                fileContentReplaceItemConfig(
+                  search: 'var_nexusPassword',
+                  replace: env.$PITS_NEXUS_PSW,
+                  matchCount: 1
+                )
+              ]
+            )
+          ]
+        )
       }
+    }
 
     stage('Build jar') {
       steps {
